@@ -1,7 +1,11 @@
 package com.gildedrose;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TexttestFixture {
     public static void main(String[] args) {
+        Logger logger = LoggerFactory.getLogger(TexttestFixture.class);
+        logger.info("TexttestFixture");
         System.out.println("OMGHAI!");
 
         Item[] items = new Item[] {
