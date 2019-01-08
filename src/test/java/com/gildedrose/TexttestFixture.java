@@ -21,6 +21,7 @@ public class TexttestFixture {
                 new Item("Conjured Mana Cake", 3, 6) };
 
         GildedRose app = new GildedRose(items);
+        logger.info("GildedRose");
 
         int days = 2;
         if (args.length > 0) {
