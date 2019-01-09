@@ -28,7 +28,7 @@ public class GildedRose {
             if (!item.name.equals("Sulfuras, Hand of Ragnaros")) {
                 logger.debug("NS: "+item.name+" "+item.sellIn+" "+item.quality);
                 SellIn(item);
-                if (!(item.name.equals("Aging Red Wine") && item.sellIn < 0))
+                if (!(item.name.equals("Aging Red Wine") && item.sellIn <= 0))
                 {
                     NormalItem(item);
                 }
@@ -39,7 +39,7 @@ public class GildedRose {
             }
             if (item.name.equals("Aging Red Wine") && item.sellIn < -100)
             {
-                QualityDown(item); 
+                QualityDown(item);
             }
         }
     }
