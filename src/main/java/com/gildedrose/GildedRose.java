@@ -28,18 +28,14 @@ public class GildedRose {
             if (!item.name.equals("Sulfuras, Hand of Ragnaros")) {
                 logger.debug("NS: "+item.name+" "+item.sellIn+" "+item.quality);
                 SellIn(item);
-                if (!(item.name.equals("Aging Red Wine") && item.sellIn <= 0))
-                {
+                if (!item.name.equals("Aging Red Wine")) {
                     NormalItem(item);
                 }
                 else
-                    {
-                    QualityUp(item);
-                    }
-            }
-            if (item.name.equals("Aging Red Wine") && item.sellIn < -100)
-            {
-                QualityDown(item);
+                {
+                    wineMethod(item);
+                }
+
             }
         }
     }
@@ -104,6 +100,21 @@ public class GildedRose {
             item.quality--;
         }
         return item.quality;
+    }
+
+    public void wineMethod(Item item)
+    {
+       // "Aging Red Wine" a une qualité stable tant que sellIn >= 0
+       // Ensuite, la qualité augmente de 1 lorsque sellIn négatif
+       // Puis, lorsque le vin est trop vieux (sellIn < -100), la qualité diminue de 1
+        if (item.sellIn < 0) {
+            QualityUp(item);
+        }
+        else{
+            if (item.sellIn < -100) {
+                QualityDown(item);
+            }
+        }
     }
 
     public Item[] getItems() {
