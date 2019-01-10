@@ -82,6 +82,15 @@ public class GildedRoseTest {
     }
 
     @Test
+    void BackstageQualityIncreaseCorrectlyMinusZero() {
+        Item[] items = new Item[]{new Item("Backstage passes to a TAFKAL80ETC concert", 0, 48)};
+        GildedRose app = new GildedRose(items);
+        app.updateQuality();
+        assertThat(app.items[0].quality).isEqualTo(0);
+
+    }
+
+    @Test
     void ConjuredItemsShouldDegradeInQualityTwiceAsFastAsNormalItems() {
         Item[] items = new Item[]{new Item("Conjured", 4, 50)};
         GildedRose app = new GildedRose(items);

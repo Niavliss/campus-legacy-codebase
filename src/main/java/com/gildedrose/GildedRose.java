@@ -3,89 +3,54 @@ package com.gildedrose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GildedRose {
     final static Logger logger = LoggerFactory.getLogger(GildedRose.class);
+    List<Product> products;
     Item[] items;
     String reports;
 
     public GildedRose(Item[] items) {
         this.items = items;
-    }
-
-    public void updateQuality() {
-        for (Item item : items) {
-            reports = "START -> " + item.name + ", " + item.sellIn + ", " + item.quality;
-            if (!item.name.equals("Sulfuras")) {
-                isAnnoyingBandBecauseNotSulfurasBand(item);
-            }
-            reports = reports + "EXIT -> " + item.name + ", " + item.sellIn + ", " + item.quality;
-            logger.debug(reports);
-        }
-    }
-
-    public void isAnnoyingBandBecauseNotSulfurasBand(Item item) {
-        if (!item.name.equals("Aged Brie") && !item.name.startsWith("Backstage passes") && !item.name.startsWith("Aging Red Wine")) {
-            this.decreaseQuality(item);
-        } else {
-            this.increaseQuality(item);
-        }
-    }
-
-    public void increaseQuality(Item item) {
-
-        if (item.quality < 50) {
-            backstageIsBetween48And50(item);
-            WineQuality(item);
-            if (!item.name.startsWith("Aging")) {
-                item.quality++;
-            }
-
-        }
-        item.sellIn = item.sellIn - 1;
-    }
-
-    public void backstageIsBetween48And50(Item item) {
-        if (item.name.startsWith("Backstage passes") && item.quality != 48 && item.quality != 49) {
-            backstageQualityIncreased(item);
-        } else if (item.name.startsWith("Backstage passes") && item.quality == 48 && item.sellIn < 10) {
-            item.quality++;
-        }
-    }
-
-    public void backstageQualityIncreased(Item item) {
-        if (item.sellIn < 11 && item.sellIn > 5) {
-            item.quality = item.quality + 1;
-        } else if (item.sellIn < 6 && item.sellIn >= 0) {
-            item.quality = item.quality + 2;
-        }
-    }
-
-    public void WineQuality(Item item) {
-        if (item.quality > 0) {
-            if (item.sellIn < 0 && item.sellIn > -100 )
-            {
-                item.quality = item.quality + 1;
-            }
-            if (item.sellIn <= -100)
-            {
-                item.quality = item.quality - 1;
+        this.products = new ArrayList<>();
+        for (int i = 0; i < this.items.length; i++) {
+            switch (items[i].name) {
+                case "Aged Brie":
+                    Brie brie = new Brie(items[i]);
+                    products.add(brie);
+                    break;
+                case "Sulfuras":
+                    Sulfuras sulfuras = new Sulfuras(items[i]);
+                    products.add(sulfuras);
+                    break;
+                case "Backstage passes to a TAFKAL80ETC concert":
+                    Backstage backstage = new Backstage(items[i]);
+                    products.add(backstage);
+                    break;
+                case "Conjured":
+                    Conjured conjured = new Conjured(items[i]);
+                    products.add(conjured);
+                    break;
+                case "Aging Red Wine":
+                    Wine wine = new Wine(items[i]);
+                    products.add(wine);
+                    break;
+                default :
+                    Product product = new Product(items[i]);
+                    products.add(product);
+                    break;
             }
         }
+
     }
 
-    public void decreaseQuality(Item item) {
-        if (item.quality > 0) {
-            if (item.name.startsWith("Conjured")) {
-                if (item.quality != 1) {
-                    item.quality = item.quality -2;
-                } else {
-                    item.quality--;
-                }
-            } else {
-                item.quality--;
-            }
+    public void updateQuality () {
+        for (Product product : this.products) {
+            product.updateQuality();
         }
-        item.sellIn--;
+
     }
 
     public Item[] getItems() {

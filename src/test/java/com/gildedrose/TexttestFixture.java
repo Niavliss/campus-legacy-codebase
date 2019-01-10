@@ -20,8 +20,8 @@ public class TexttestFixture {
                 // this conjured item does not work properly yet
                 new Item("Conjured Mana Cake", 3, 6),
                 // new feature
-                new Item("Aging Red Wine", 2, 6) };
-
+                new Item("Aging Red Wine", 2, 6) ,
+                new Item("Backstage passes to a TAFKAL80ETC concert", 11, 49)};
 
         GildedRose app = new GildedRose(items);
 
