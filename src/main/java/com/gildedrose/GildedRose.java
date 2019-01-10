@@ -1,23 +1,12 @@
 package com.gildedrose;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-/*étape 1, vérifier que l'item n'est pas Sulfuras car c'est le seul qui ne bouge pas
-étape 2, Faire baisser le sellIn, tout les objets ont le sellIn qui déscend peut importe ce qu'il se passe
-étape 3, Modifier la qualité, a=0 b=monte, c=descend. a=Concert terminé b=Brie ou Concert c=tout le reste
-étape 3a, Si c'est un Concert avec SellIn<0, la qualité passe à 0 (on a pas besoin de regarder si quality<50
-étape 3b, Si la qualité est inférieur à 50, la qualité monte de 1
-étape 3b1, Si Concert, monter la qualité suivant le sellIn
-étape 3b2, En dehors du concert (else if) si sellIn est inférieur à 0, la qualité monte de 1
-étape 3c, Si la qualité est >=0, la qualité descend de 1 (-1)
-étape 3c1, Si sellIn est <0, la qualité descend encore de 1 (-2)
-étape 3c2, Si Conjured, la qualité descend encore de 1 (-2)
-étape 3c2a, Si sellIn est <0 (et Conjured), la qualité descend encore de 1 (-4) (qualité <0, Conjuré, 2*(sellIn<0))*/
 
 public class GildedRose {
     final static Logger logger = LoggerFactory.getLogger(GildedRose.class);
     Item[] items;
-    String concert="Backstage passes to a TAFKAL80ETC concert";
+    String reports;
 
     public GildedRose(Item[] items) {
         this.items = items;
@@ -25,96 +14,80 @@ public class GildedRose {
 
     public void updateQuality() {
         for (Item item : items) {
-            if (!item.name.equals("Sulfuras, Hand of Ragnaros")) {
-                logger.debug("NS: "+item.name+" "+item.sellIn+" "+item.quality);
-                SellIn(item);
-                if (!item.name.equals("Aging Red Wine")) {
-                    NormalItem(item);
-                }
-                else
-                {
-                    wineMethod(item);
-                }
-
+            reports = "START -> " + item.name + ", " + item.sellIn + ", " + item.quality;
+            if (!item.name.equals("Sulfuras")) {
+                isAnnoyingBandBecauseNotSulfurasBand(item);
             }
+            reports = reports + "EXIT -> " + item.name + ", " + item.sellIn + ", " + item.quality;
+            logger.debug(reports);
         }
     }
 
-    public int SellIn(Item item){
-        return item.sellIn --;
-    }
-
-    public void NormalItem(Item item){
-        if (item.name.equals("Aged Brie")|| item.name.equals(concert)) {
-            item.quality = QualityUp(item);
-            logger.debug("UP: "+item.name+" "+item.sellIn+" "+item.quality);
-        }
-        else{
-            item.quality = QualityDown(item);
-            logger.debug("DW: "+item.name+" "+item.sellIn+" "+item.quality);
+    public void isAnnoyingBandBecauseNotSulfurasBand(Item item) {
+        if (!item.name.equals("Aged Brie") && !item.name.startsWith("Backstage passes") && !item.name.startsWith("Aging Red Wine")) {
+            this.decreaseQuality(item);
+        } else if (item.name.startsWith("Aging Red Wine")) {
+            this.WineQuality(item);
+        } else {
+            this.increaseQuality(item);
         }
     }
 
-    public int QualityUp(Item item){
-        if ((item.name.equals(concert))&&(item.sellIn < 0)) {
-            return item.quality=0;
-        } if (item.quality < 50) {
-            item.quality=WhenQualityUnderFifty(item);
-        } return item.quality;
+    public void increaseQuality(Item item) {
+
+        if (item.quality < 50) {
+            backstageIsBetween48And50(item);
+            WineQuality(item);
+            if (!item.name.startsWith("Aging")) {
+                item.quality++;
+            }
+
+        }
+        item.sellIn--;
     }
 
-    public int QualityDown(Item item) {
+    public void backstageIsBetween48And50(Item item) {
+        if (item.name.startsWith("Backstage passes") && item.quality != 48 && item.quality != 49) {
+            backstageQualityIncreased(item);
+        } else if (item.name.startsWith("Backstage passes") && item.quality == 48 && item.sellIn < 10) {
+            item.quality++;
+        }
+    }
+
+    public void backstageQualityIncreased(Item item) {
+        if (item.sellIn < 11 && item.sellIn > 5) {
+            item.quality = item.quality + 1;
+        } else if (item.sellIn < 6 && item.sellIn >= 0) {
+            item.quality = item.quality + 2;
+        }
+    }
+
+    public void WineQuality(Item item) {
         if (item.quality > 0) {
-            item.quality--;
-            if (item.sellIn < 0 && item.quality > 0) {
+            if (item.sellIn < 0 && item.sellIn > -100 )
+            {
+                item.quality = item.quality + 1;
+            }
+            if (item.sellIn <= -100)
+            {
+                item.quality = item.quality - 1;
+            }
+        }
+    }
+
+    public void decreaseQuality(Item item) {
+        if (item.quality > 0) {
+            if (item.name.startsWith("Conjured")) {
+                if (item.quality != 1) {
+                    item.quality = item.quality -2;
+                } else {
+                    item.quality--;
+                }
+            } else {
                 item.quality--;
-            } if (item.name.equals("Conjured Mana Cake")&& item.quality > 0){
-                item.quality=ConjuredThings(item);
-            }
-        } return item.quality;
-    }
-
-    public int WhenQualityUnderFifty(Item item){
-        item.quality ++;
-        if (item.name.equals(concert)) {
-            item.quality = DayConcert(item);
-        } else if (item.sellIn < 0){
-            item.quality ++;
-        }
-        return item.quality;
-    }
-
-    public int DayConcert(Item item){
-        if (item.sellIn < 11 && item.quality < 50) {
-            item.quality ++;
-        }
-        if (item.sellIn < 6 && item.quality < 50) {
-            item.quality ++;
-        }
-        return item.quality;
-    }
-
-    public int ConjuredThings(Item item){
-        item.quality--;
-        if (item.sellIn < 0 && item.quality > 0) {
-            item.quality--;
-        }
-        return item.quality;
-    }
-
-    public void wineMethod(Item item)
-    {
-       // "Aging Red Wine" a une qualité stable tant que sellIn >= 0
-       // Ensuite, la qualité augmente de 1 lorsque sellIn négatif
-       // Puis, lorsque le vin est trop vieux (sellIn < -100), la qualité diminue de 1
-        if (item.sellIn < 0) {
-            QualityUp(item);
-        }
-        else{
-            if (item.sellIn < -100) {
-                QualityDown(item);
             }
         }
+        item.sellIn--;
     }
 
     public Item[] getItems() {
