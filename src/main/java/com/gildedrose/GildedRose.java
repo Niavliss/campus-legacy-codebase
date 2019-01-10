@@ -1,5 +1,6 @@
 package com.gildedrose;
 
+import com.google.common.collect.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,47 +9,41 @@ import java.util.List;
 
 public class GildedRose {
     final static Logger logger = LoggerFactory.getLogger(GildedRose.class);
-    List<Product> products;
     Item[] items;
-    String reports;
 
     public GildedRose(Item[] items) {
         this.items = items;
-        this.products = new ArrayList<>();
-        for (int i = 0; i < this.items.length; i++) {
-            switch (items[i].name) {
-                case "Aged Brie":
-                    Brie brie = new Brie(items[i]);
-                    products.add(brie);
-                    break;
-                case "Sulfuras":
-                    Sulfuras sulfuras = new Sulfuras(items[i]);
-                    products.add(sulfuras);
-                    break;
-                case "Backstage passes to a TAFKAL80ETC concert":
-                    Backstage backstage = new Backstage(items[i]);
-                    products.add(backstage);
-                    break;
-                case "Conjured":
-                    Conjured conjured = new Conjured(items[i]);
-                    products.add(conjured);
-                    break;
-                case "Aging Red Wine":
-                    Wine wine = new Wine(items[i]);
-                    products.add(wine);
-                    break;
-                default :
-                    Product product = new Product(items[i]);
-                    products.add(product);
-                    break;
-            }
-        }
-
     }
 
+    private List<Rule> selectRules(Item item) {
+        switch (item.name) {
+//            case "Aged Brie":
+//                return new Brie(item);
+//            case "Sulfuras":
+//                return new Sulfuras(item);
+//            case "Backstage passes to a TAFKAL80ETC concert":
+//                return new Backstage(item);
+//            case "Conjured":
+//                return new Conjured(item);
+//            case "Aging Red Wine":
+//                return new Wine(item);
+            default :
+                List<Rule> rules = new ArrayList<>();
+                Rule rule = new Rule(Range.all(), _item -> _item.quality--);
+                rules.add(rule);
+                return rules;
+        }
+    }
+
+
     public void updateQuality () {
-        for (Product product : this.products) {
-            product.updateQuality();
+        for (Item item : items) {
+            List<Rule> rules = this.selectRules(item);
+            for (int i = 0; i < rules.size(); i++) {
+                if (rules.get(i).integerRange.contains(item.sellIn)) {
+                    rules.get(i).consumer.accept(item);
+                }
+            }
         }
 
     }
