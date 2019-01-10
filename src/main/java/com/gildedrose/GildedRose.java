@@ -26,8 +26,6 @@ public class GildedRose {
     public void isAnnoyingBandBecauseNotSulfurasBand(Item item) {
         if (!item.name.equals("Aged Brie") && !item.name.startsWith("Backstage passes") && !item.name.startsWith("Aging Red Wine")) {
             this.decreaseQuality(item);
-        } else if (item.name.startsWith("Aging Red Wine")) {
-            this.WineQuality(item);
         } else {
             this.increaseQuality(item);
         }
@@ -43,7 +41,7 @@ public class GildedRose {
             }
 
         }
-        item.sellIn--;
+        item.sellIn = item.sellIn - 1;
     }
 
     public void backstageIsBetween48And50(Item item) {
